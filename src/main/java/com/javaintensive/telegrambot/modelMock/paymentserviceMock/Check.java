@@ -1,4 +1,4 @@
-package com.javaintensive.telegrambot.model.paymentservice;
+package com.javaintensive.telegrambot.modelMock.paymentserviceMock;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,6 +1,6 @@
-package com.javaintensive.telegrambot.model;
+package com.javaintensive.telegrambot.modelMock;
 
-import com.javaintensive.telegrambot.model.storeservice.Product;
+import com.javaintensive.telegrambot.modelMock.storeserviceMock.Product;
 
 import java.util.Collection;
 import java.util.Collections;

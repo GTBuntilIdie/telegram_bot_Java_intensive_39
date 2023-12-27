@@ -1,4 +1,4 @@
-package com.javaintensive.telegrambot.model.paymentservice;
+package com.javaintensive.telegrambot.modelMock.paymentserviceMock;
 
 public class PaymentData {
     private String cardNumber;

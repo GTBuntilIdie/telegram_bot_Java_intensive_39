@@ -1,14 +1,14 @@
-package com.javaintensive.telegrambot.service;
+package com.javaintensive.telegrambot.servicemock;
 
-import com.javaintensive.telegrambot.model.orderservice.Order;
-import com.javaintensive.telegrambot.model.orderservice.OrderPreparedToPay;
-import com.javaintensive.telegrambot.model.storeservice.Product;
+import com.javaintensive.telegrambot.modelMock.orderserviceMock.Order;
+import com.javaintensive.telegrambot.modelMock.orderserviceMock.OrderPreparedToPay;
+import com.javaintensive.telegrambot.modelMock.storeserviceMock.Product;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
 @Service
-public class OrderService {
+public class OrderServiceMock {
     public OrderPreparedToPay sendOrder(Order order) {
         BigDecimal sum = BigDecimal.ZERO;
         for(Product product : order.getProducts()) {

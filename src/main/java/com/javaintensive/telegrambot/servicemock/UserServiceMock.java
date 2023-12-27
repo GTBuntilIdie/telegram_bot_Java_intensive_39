@@ -1,6 +1,6 @@
-package com.javaintensive.telegrambot.service;
+package com.javaintensive.telegrambot.servicemock;
 
-import com.javaintensive.telegrambot.model.userservice.User;
+import com.javaintensive.telegrambot.modelMock.userserviceMock.User;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserServiceMock {
 
     Map<Long, User> users = new HashMap<>();
 

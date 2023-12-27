@@ -1,4 +1,4 @@
-package com.javaintensive.telegrambot.model.userservice;
+package com.javaintensive.telegrambot.modelMock.userserviceMock;
 
 public enum Role {
     COURIER("Курьер"),

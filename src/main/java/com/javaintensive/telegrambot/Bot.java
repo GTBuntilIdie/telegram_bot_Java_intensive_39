@@ -1,19 +1,19 @@
 package com.javaintensive.telegrambot;
 
-import com.javaintensive.telegrambot.model.UserActionsData;
-import com.javaintensive.telegrambot.model.orderservice.Order;
-import com.javaintensive.telegrambot.model.orderservice.OrderPreparedToPay;
-import com.javaintensive.telegrambot.model.paymentservice.PaymentData;
-import com.javaintensive.telegrambot.model.paymentservice.Check;
-import com.javaintensive.telegrambot.model.storeservice.Product;
-import com.javaintensive.telegrambot.model.userservice.Role;
-import com.javaintensive.telegrambot.model.Bucket;
-import com.javaintensive.telegrambot.model.storeservice.Store;
-import com.javaintensive.telegrambot.model.userservice.User;
-import com.javaintensive.telegrambot.service.OrderService;
-import com.javaintensive.telegrambot.service.PaymentService;
-import com.javaintensive.telegrambot.service.StoreService;
-import com.javaintensive.telegrambot.service.UserService;
+import com.javaintensive.telegrambot.modelMock.UserActionsDataMock;
+import com.javaintensive.telegrambot.modelMock.orderserviceMock.Order;
+import com.javaintensive.telegrambot.modelMock.orderserviceMock.OrderPreparedToPay;
+import com.javaintensive.telegrambot.modelMock.paymentserviceMock.PaymentData;
+import com.javaintensive.telegrambot.modelMock.paymentserviceMock.Check;
+import com.javaintensive.telegrambot.modelMock.storeserviceMock.Product;
+import com.javaintensive.telegrambot.modelMock.userserviceMock.Role;
+import com.javaintensive.telegrambot.modelMock.Bucket;
+import com.javaintensive.telegrambot.modelMock.storeserviceMock.Store;
+import com.javaintensive.telegrambot.modelMock.userserviceMock.User;
+import com.javaintensive.telegrambot.servicemock.OrderServiceMock;
+import com.javaintensive.telegrambot.servicemock.PaymentServiceMock;
+import com.javaintensive.telegrambot.servicemock.StoreServiceMock;
+import com.javaintensive.telegrambot.servicemock.UserServiceMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -52,7 +52,7 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${telegram.bot.name}")
     private String name;
 
-    private Map<Long, UserActionsData> userActionsDataMap = new HashMap<>();
+    private Map<Long, UserActionsDataMock> userActionsDataMap = new HashMap<>();
 
     private Set<Long> enabledWriteAddress = new HashSet<>();
 
@@ -64,16 +64,16 @@ public class Bot extends TelegramLongPollingBot {
     private CardValidator cardValidator;
 
     @Autowired
-    private UserService userService;
+    private UserServiceMock userService;
 
     @Autowired
-    private StoreService storeService;
+    private StoreServiceMock storeService;
 
     @Autowired
-    private OrderService orderService;
+    private OrderServiceMock orderService;
 
     @Autowired
-    private PaymentService paymentService;
+    private PaymentServiceMock paymentService;
 
     public Bot(@Value("${telegram.bot.token}") String token) {
         super(token);
@@ -217,7 +217,7 @@ public class Bot extends TelegramLongPollingBot {
             Store store = storeService.findById(storeId);
             String storeDescription = createStoreDescription(store);
             List<Product> products = storeService.findGoodsByStore(store);
-            UserActionsData buyingElements = new UserActionsData();
+            UserActionsDataMock buyingElements = new UserActionsDataMock();
             buyingElements.setBucket(new Bucket(store.id(), products));
             this.userActionsDataMap.put(chatId, buyingElements);
             SendMessage storeDescriptionMessage = createSendMessage(chatId, storeDescription);
@@ -244,6 +244,21 @@ public class Bot extends TelegramLongPollingBot {
             sendMessage.setReplyMarkup(inlineKeyboardMarkup);
             execute(sendMessage);
         }
+    }
+
+
+    private String createStoreDescription(Store store) {
+        return store.name().toUpperCase() + "\n" +
+                "Описание:\n" + store.description() + "\n" +
+                "Адрес: " + store.address() + "\n" +
+                "Горячая линия магазина: " + store.phone();
+    }
+
+    private String createProductDescription(Product product) {
+        return product.getName() + "\n" +
+                product.getDescription() + "\n" +
+                "Доступно на складе: " + product.getLimitQuantity() + "\n" +
+                "Цена: " + product.getPrice() + " руб.";
     }
 
     private void bucketEvent(long chatId, String data) {
@@ -304,11 +319,6 @@ public class Bot extends TelegramLongPollingBot {
         execute(sendMessage);
     }
 
-    private void messageError(long chatId) {
-        SendMessage sendMessage = createSendMessage(chatId, "Unexpected Message");
-        execute(sendMessage);
-    }
-
     private void notRegistered(long chatId) {
         SendMessage sendMessage = createSendMessage(chatId, "Вам нужно зарегистрироваться");
         execute(sendMessage);
@@ -322,16 +332,16 @@ public class Bot extends TelegramLongPollingBot {
     
     private void readAddress(long chatId, String address) {
         enabledWriteAddress.remove(chatId);
-        UserActionsData buyingElements = this.userActionsDataMap.get(chatId);
-        Bucket bucket = this.userActionsDataMap.get(chatId).getBucket();
+        UserActionsDataMock userActionsData = userActionsDataMap.get(chatId);
+        Bucket bucket = userActionsData.getBucket();
         List<Product> products = new ArrayList<>();
         for(Product product : bucket.getProducts()) {
             if(product.getQuantity() > 0) products.add(product);
         }
         Order order = new Order(bucket.getStoreId(), chatId, products, address);
         OrderPreparedToPay orderPreparedToPay = orderService.sendOrder(order);
-        buyingElements.setOrder(order);
-        buyingElements.setOrderPreparedToPay(orderPreparedToPay);
+        userActionsData.setOrder(order);
+        userActionsData.setOrderPreparedToPay(orderPreparedToPay);
         SendMessage sendMessage = createSendMessage(chatId, "Заказ сформирован, итого: " +  orderPreparedToPay.sum().toString() + " руб.");
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton button = createButton("Оплатить", "pay");
@@ -349,7 +359,7 @@ public class Bot extends TelegramLongPollingBot {
         cardMessageQueues.put(chatId, cardMessageQueue);
         SendMessage sendMessage = createSendMessage(chatId, "Введите номер карты");
         PaymentData paymentInfo = new PaymentData();
-        UserActionsData buyingElements = this.userActionsDataMap.get(chatId);
+        UserActionsDataMock buyingElements = this.userActionsDataMap.get(chatId);
         buyingElements.setPaymentInfo(paymentInfo);
         execute(sendMessage);
     }
@@ -358,7 +368,7 @@ public class Bot extends TelegramLongPollingBot {
         cardData = cardData.strip();
         Queue<String> cardMessageQueue = cardMessageQueues.get(chatId);
         int messageCount = cardMessageQueue.size();
-        UserActionsData buyingElements = this.userActionsDataMap.get(chatId);
+        UserActionsDataMock buyingElements = this.userActionsDataMap.get(chatId);
         PaymentData paymentInfo = buyingElements.getPaymentInfo();
         String message;
         switch (messageCount) {
@@ -405,7 +415,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private void sendToPaymentService(long chatId) {
-        UserActionsData userActionsData = userActionsDataMap.get(chatId);
+        UserActionsDataMock userActionsData = userActionsDataMap.get(chatId);
         Order order = userActionsData.getOrder();
         order.setPaid(true);
         orderService.closeOrder(order);
@@ -439,18 +449,10 @@ public class Bot extends TelegramLongPollingBot {
         return inlineKeyboardButton;
     }
 
-    private String createStoreDescription(Store store) {
-        return store.name().toUpperCase() + "\n" +
-                "Описание:\n" + store.description() + "\n" +
-                "Адрес: " + store.address() + "\n" +
-                "Горячая линия магазина: " + store.phone();
-    }
 
-    private String createProductDescription(Product product) {
-        return product.getName() + "\n" +
-                product.getDescription() + "\n" +
-                "Доступно на складе: " + product.getLimitQuantity() + "\n" +
-                "Цена: " + product.getPrice() + " руб.";
+    private void messageError(long chatId) {
+        SendMessage sendMessage = createSendMessage(chatId, "Unexpected Message");
+        execute(sendMessage);
     }
 
     @Override

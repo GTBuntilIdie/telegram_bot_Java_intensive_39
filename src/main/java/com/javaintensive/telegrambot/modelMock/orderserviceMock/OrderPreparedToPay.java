@@ -1,4 +1,4 @@
-package com.javaintensive.telegrambot.model.orderservice;
+package com.javaintensive.telegrambot.modelMock.orderserviceMock;
 
 import java.math.BigDecimal;
 

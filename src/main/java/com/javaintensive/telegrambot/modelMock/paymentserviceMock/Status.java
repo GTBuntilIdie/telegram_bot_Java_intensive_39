@@ -1,4 +1,4 @@
-package com.javaintensive.telegrambot.model.paymentservice;
+package com.javaintensive.telegrambot.modelMock.paymentserviceMock;
 
 public enum Status {
     PAID("Оплачен"),

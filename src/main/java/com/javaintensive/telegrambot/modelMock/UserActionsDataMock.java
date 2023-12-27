@@ -1,10 +1,10 @@
-package com.javaintensive.telegrambot.model;
+package com.javaintensive.telegrambot.modelMock;
 
-import com.javaintensive.telegrambot.model.orderservice.Order;
-import com.javaintensive.telegrambot.model.orderservice.OrderPreparedToPay;
-import com.javaintensive.telegrambot.model.paymentservice.PaymentData;
+import com.javaintensive.telegrambot.modelMock.orderserviceMock.Order;
+import com.javaintensive.telegrambot.modelMock.orderserviceMock.OrderPreparedToPay;
+import com.javaintensive.telegrambot.modelMock.paymentserviceMock.PaymentData;
 
-public class UserActionsData {
+public class UserActionsDataMock {
 
     private Bucket bucket;
 

@@ -1,19 +1,19 @@
-package com.javaintensive.telegrambot.model.orderservice;
+package com.javaintensive.telegrambot.modelMock.orderserviceMock;
 
-import com.javaintensive.telegrambot.model.storeservice.Product;
+import com.javaintensive.telegrambot.modelMock.storeserviceMock.Product;
 
 import java.util.List;
 
 public class Order {
     private Long storeId;
-    private Long chatId;
+    private Long userId;
     private List<Product> products;
     private String address;
     private boolean paid;
 
     public Order(Long storeId, Long chatId, List<Product> products, String address) {
         this.storeId = storeId;
-        this.chatId = chatId;
+        this.userId = chatId;
         this.products = products;
         this.address = address;
     }
@@ -26,12 +26,12 @@ public class Order {
         this.storeId = storeId;
     }
 
-    public Long getChatId() {
-        return chatId;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setChatId(Long chatId) {
-        this.chatId = chatId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public List<Product> getProducts() {

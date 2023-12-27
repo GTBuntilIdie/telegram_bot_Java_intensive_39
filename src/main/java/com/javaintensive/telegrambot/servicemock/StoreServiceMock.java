@@ -1,8 +1,7 @@
-package com.javaintensive.telegrambot.service;
+package com.javaintensive.telegrambot.servicemock;
 
-import com.javaintensive.telegrambot.model.orderservice.Order;
-import com.javaintensive.telegrambot.model.storeservice.Product;
-import com.javaintensive.telegrambot.model.storeservice.Store;
+import com.javaintensive.telegrambot.modelMock.storeserviceMock.Product;
+import com.javaintensive.telegrambot.modelMock.storeserviceMock.Store;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -11,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class StoreService {
+public class StoreServiceMock {
 
     Map<Long, Store> stores = new HashMap<>();
     Map<Store, List<Product>> products = new HashMap<>();
