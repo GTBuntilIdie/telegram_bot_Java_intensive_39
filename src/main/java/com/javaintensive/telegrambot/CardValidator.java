@@ -13,7 +13,7 @@ public class CardValidator {
     }
 
     public boolean isValidCardDate(String cardDate) {
-        if(cardDate.matches("\\d{2}\\\\\\d{2}")) {
+        if(cardDate.matches("\\d{2}/\\d{2}")) {
             String month = cardDate.substring(0, 2);
             if(month.charAt(0) != '0') {
                 int number = Integer.parseInt(month);

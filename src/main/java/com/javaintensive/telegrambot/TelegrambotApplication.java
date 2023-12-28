@@ -10,7 +10,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @SpringBootApplication
 @EnableFeignClients
 @EnableScheduling
-@EnableFeignClients
 public class TelegrambotApplication {
 
 	public static void main(String[] args) {

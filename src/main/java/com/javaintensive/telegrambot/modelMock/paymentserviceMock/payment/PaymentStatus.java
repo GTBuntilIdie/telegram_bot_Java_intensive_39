@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentStatus {
-    PAID("Оплачено"),
-    NOT_PAID("Отменено");
+    PAID("Оплачен"),
+    NOT_PAID("Отменен");
 
     String title;
 

@@ -3,9 +3,11 @@ package com.javaintensive.telegrambot;
 import com.javaintensive.telegrambot.modelMock.UserActionsDataMock;
 import com.javaintensive.telegrambot.modelMock.orderserviceMock.Order;
 import com.javaintensive.telegrambot.modelMock.orderserviceMock.OrderPreparedToPay;
+import com.javaintensive.telegrambot.modelMock.paymentserviceMock.Check;
 import com.javaintensive.telegrambot.modelMock.paymentserviceMock.PaymentData;
 import com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment.PaymentApiResponse;
 import com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment.PaymentService;
+import com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment.PaymentStatus;
 import com.javaintensive.telegrambot.modelMock.storeserviceMock.Product;
 import com.javaintensive.telegrambot.modelMock.userserviceMock.Role;
 import com.javaintensive.telegrambot.modelMock.Bucket;
@@ -113,6 +115,7 @@ public class Bot extends TelegramLongPollingBot {
             case "deliveries" -> deliveries(chatId);
             case "show bucket" -> showBucket(chatId);
             case "create order" -> writeAddress(chatId);
+            case "back to orders" -> stores(chatId);
             case "pay" -> pay(chatId);
             default -> {
                 if(data.matches("store: .*")) {
@@ -359,8 +362,10 @@ public class Bot extends TelegramLongPollingBot {
         cardMessageQueues.put(chatId, cardMessageQueue);
         SendMessage sendMessage = createSendMessage(chatId, "Введите номер карты");
         PaymentData paymentInfo = new PaymentData();
-        UserActionsDataMock buyingElements = this.userActionsDataMap.get(chatId);
-        buyingElements.setPaymentInfo(paymentInfo);
+        UserActionsDataMock userActionsDataMock = userActionsDataMap.get(chatId);
+        userActionsDataMock.setPaymentInfo(paymentInfo);
+        OrderPreparedToPay orderPreparedToPay = userActionsDataMock.getOrderPreparedToPay();
+        paymentInfo.setOrderId(orderPreparedToPay.id());
         execute(sendMessage);
     }
 
@@ -396,7 +401,7 @@ public class Bot extends TelegramLongPollingBot {
                     paymentInfo.setDateCard(cardData);
                     message = cardMessageQueue.poll();
                 } else
-                    message = "Неверно введен срок действия карты. Верный формат: mm\\yy";
+                    message = "Неверно введен срок действия карты. Верный формат: mm/yy";
                 sendMessage(chatId, message);
             }
             case 0 -> {
@@ -421,13 +426,21 @@ public class Bot extends TelegramLongPollingBot {
         orderService.closeOrder(order);
         PaymentData paymentInfo = userActionsData.getPaymentInfo();
         BigDecimal sum = userActionsData.getOrderPreparedToPay().sum();
-        Check paymentStatus = paymentService.pay(paymentInfo, sum);
+        PaymentApiResponse paymentApiResponse = paymentService.pay(paymentInfo, sum);
         userActionsDataMap.remove(chatId);
+        PaymentStatus paymentStatus = paymentApiResponse.getStatus();
+        String message = "";
+        if(paymentStatus.equals(PaymentStatus.NOT_PAID)) {
+            message = "Произошла ошибка при оплате, попробуйте снова\n";
+        }
         String check = "Чек:\n" +
-                "Дата: " + paymentStatus.getDate() + "\n" +
-                "Статус: " + paymentStatus.getStatus().title() + "\n" +
-                "Итого: " + paymentStatus.getSum().toString() + " руб.";
-        SendMessage sendMessage = createSendMessage(chatId, check);
+                "Дата: " + paymentApiResponse.getDate() + "\n" +
+                "Статус: " + paymentApiResponse.getStatus().getTitle() + "\n" +
+                "Итого: " + paymentApiResponse.getPrice() + " руб.";
+        message = message.concat(check);
+        SendMessage sendMessage = createSendMessage(chatId, message);
+        InlineKeyboardButton button = createButton("Вернуться назад", "back to orders");
+        sendMessage.setReplyMarkup(new InlineKeyboardMarkup(List.of(List.of(button))));
         execute(sendMessage);
     }
 

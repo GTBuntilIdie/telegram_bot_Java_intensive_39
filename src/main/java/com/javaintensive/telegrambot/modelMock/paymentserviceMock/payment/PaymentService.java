@@ -30,7 +30,7 @@ public class PaymentService {
         paymentDTO.setCustomerName(paymentInfo.getCardholderName());
         paymentDTO.setDateCard(paymentInfo.getDateCard());
         paymentDTO.setCvv(paymentInfo.getCvv());
-        paymentDTO.setPrice(sum.intValue());
+        paymentDTO.setTotalPrice(sum);
         return externalPaymentApi.doPayment(paymentDTO);
     }
 }

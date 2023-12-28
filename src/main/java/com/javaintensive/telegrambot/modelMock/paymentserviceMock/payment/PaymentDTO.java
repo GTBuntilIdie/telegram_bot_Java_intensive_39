@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -31,6 +33,6 @@ public class PaymentDTO {
     @Pattern(regexp="^\\d{3}$", message = "CVV код должен состоять из 3 цифр")
     private String cvv;
 
-    private Integer price;
+    private BigDecimal totalPrice;
 
 }
