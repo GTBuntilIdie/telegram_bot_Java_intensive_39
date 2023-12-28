@@ -1,4 +1,4 @@
-package com.javaintensive.telegrambot.modelMock.paymentserviceMock;
+package com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;

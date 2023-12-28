@@ -1,8 +1,6 @@
-package com.javaintensive.telegrambot.modelMock.paymentserviceMock;
+package com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,12 +16,11 @@ public class Controller {
 
 
     @PostMapping("/payment")
-   PaymentApiResponse paymentApiResponce(@RequestBody PaymentDTO dto) {
+    PaymentApiResponse paymentApiResponce(@RequestBody PaymentDTO dto) {
         return externalPaymentApi.doPayment(dto);
     }
 
-    @GetMapping(path = "/payment/{orderId}", consumes = "application/json",
-            produces = "application/json")
+    @GetMapping(path = "/payment/{orderId}", produces = "application/json")
     public PaymentApiResponse checkPayment(@PathVariable Long orderId) {
         System.out.println(orderId);
 

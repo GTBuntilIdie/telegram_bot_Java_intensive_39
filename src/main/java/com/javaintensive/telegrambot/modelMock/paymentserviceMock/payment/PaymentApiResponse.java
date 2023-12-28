@@ -1,4 +1,4 @@
-package com.javaintensive.telegrambot.modelMock.paymentserviceMock;
+package com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment;
 
 import lombok.Getter;
 import lombok.Setter;

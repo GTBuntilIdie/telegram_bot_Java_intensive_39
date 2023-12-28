@@ -4,14 +4,14 @@ import com.javaintensive.telegrambot.modelMock.UserActionsDataMock;
 import com.javaintensive.telegrambot.modelMock.orderserviceMock.Order;
 import com.javaintensive.telegrambot.modelMock.orderserviceMock.OrderPreparedToPay;
 import com.javaintensive.telegrambot.modelMock.paymentserviceMock.PaymentData;
-import com.javaintensive.telegrambot.modelMock.paymentserviceMock.Check;
+import com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment.PaymentApiResponse;
+import com.javaintensive.telegrambot.modelMock.paymentserviceMock.payment.PaymentService;
 import com.javaintensive.telegrambot.modelMock.storeserviceMock.Product;
 import com.javaintensive.telegrambot.modelMock.userserviceMock.Role;
 import com.javaintensive.telegrambot.modelMock.Bucket;
 import com.javaintensive.telegrambot.modelMock.storeserviceMock.Store;
 import com.javaintensive.telegrambot.modelMock.userserviceMock.User;
 import com.javaintensive.telegrambot.servicemock.OrderServiceMock;
-import com.javaintensive.telegrambot.servicemock.PaymentServiceMock;
 import com.javaintensive.telegrambot.servicemock.StoreServiceMock;
 import com.javaintensive.telegrambot.servicemock.UserServiceMock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class Bot extends TelegramLongPollingBot {
     private OrderServiceMock orderService;
 
     @Autowired
-    private PaymentServiceMock paymentService;
+    private PaymentService paymentService;
 
     public Bot(@Value("${telegram.bot.token}") String token) {
         super(token);
@@ -415,18 +415,18 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private void sendToPaymentService(long chatId) {
-        UserActionsDataMock userActionsData = userActionsDataMap.get(chatId);
+        UserActionsDataMock userActionsData = userActionsDataMap.get(chatId); // корзина с информацией
         Order order = userActionsData.getOrder();
         order.setPaid(true);
         orderService.closeOrder(order);
         PaymentData paymentInfo = userActionsData.getPaymentInfo();
         BigDecimal sum = userActionsData.getOrderPreparedToPay().sum();
-        Check paymentStatus = paymentService.pay(paymentInfo, sum);
+        PaymentApiResponse paymentStatus = paymentService.pay(paymentInfo, sum); // тут дергается сервис пэймент метод оплаты
         userActionsDataMap.remove(chatId);
         String check = "Чек:\n" +
                 "Дата: " + paymentStatus.getDate() + "\n" +
-                "Статус: " + paymentStatus.getStatus().title() + "\n" +
-                "Итого: " + paymentStatus.getSum().toString() + " руб.";
+                "Статус: " + paymentStatus.getStatus().getTitle() + "\n" +
+                "Итого: " + paymentStatus.getPrice().toString() + " руб.";
         SendMessage sendMessage = createSendMessage(chatId, check);
         execute(sendMessage);
     }
